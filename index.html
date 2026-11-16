@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Верити</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            overflow: hidden;
+        }
+
+        /* Контейнер для шара */
+        .ball-container {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Жёлтый смайлик */
+        .smiley { 
+            width: 400px; 
+            height: 400px; 
+            background: #ffcc00; 
+            border-radius: 50%;
+            position: relative; 
+            box-shadow: 0 0 60px rgba(255, 204, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        /* Анимация говорения (пульсация) */
+        .smiley.speaking { 
+            animation: pulse 0.5s infinite alternate; 
+        }
+        @keyframes pulse { 
+            0% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); } 
+            100% { transform: scale(1.05); box-shadow: 0 0 120px rgba(255, 204, 0, 0.8); } 
+        }
+        
+        /* Глаза */
+        .eye { 
+            position: absolute; 
+            top: 110px; 
+            width: 30px; 
+            height: 60px; 
+            background: #000; 
+            border-radius: 50%; 
+            transition: all 0.2s ease; 
+        }
+        .eye.left { left: 110px; } 
+        .eye.right { right: 110px; }
+        
+        /* Рот */
+        .mouth { 
+            position: absolute; 
+            bottom: 90px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 160px; 
+            height: 60px; 
+            border-bottom: 12px solid #000; 
+            border-radius: 0 0 100px 100px; 
+            transition: all 0.3s ease; 
+        }
+        
+        /* Анимация рта */
+        .smiley.speaking .mouth { 
+            animation: talk 0.3s infinite alternate; 
+        }
+        @keyframes talk { 
+            0% { height: 60px; width: 160px; border-bottom-width: 12px; } 
+            100% { height: 80px; width: 140px; border-bottom-width: 20px; } 
+        }
+        
+        /* Анимация глаз */
+        .smiley.speaking .eye {
+            animation: blink 0.6s infinite alternate;
+        }
+        @keyframes blink {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(0.5); }
+        }
+        
+        /* Поле ввода (скрытое) */
+        .input-area { 
+            position: absolute; 
+            bottom: -80px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%; 
+            z-index: 20; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
+        }
+        
+        .ball-container:hover .input-area { 
+            opacity: 0.5; 
+        }
+        
+        .input-area input { 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            background: transparent; 
+            color: #fff; 
+            font-size: 18px; 
+            outline: none; 
+            font-family: 'VT323', monospace; 
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        .hint { 
+            position: absolute; 
+            bottom: 20px; 
+            font-size: 12px; 
+            color: #555; 
+            text-align: center; 
+            width: 100%; 
+            pointer-events: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ball-container" id="mainBall">
+        
+        <div class="smiley" id="ballInner">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="mouth"></div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Напиши мне..." onkeypress="if(event.key==='Enter') sendTextMessage()">
+        </div>
+    </div>
+    
+    <div class="hint">Кликни по смайлику и напиши сообщение</div>
+
+<script>
+const ballInner = document.getElementById('ballInner');
+const mainBall = document.getElementById('mainBall');
+const userInput = document.getElementById('userInput');
+let russianVoice = null;
+
+function initVoices() {
+    const voices = window.speechSynthesis.getVoices();
+    russianVoice = voices.find(v => v.lang.includes('ru')) || voices[0];
+}
+speechSynthesis.onvoiceschanged = initVoices;
+initVoices();
+
+function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    ballInner.classList.add('speaking');
+    
+    let cleanText = text.replace(/[\u{1F600}-\u{1F64F}]/gu, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'ru-RU';
+    if (russianVoice) utterance.voice = russianVoice;
+    utterance.rate = 0.9; 
+    utterance.pitch = 0.9; 
+    
+    utterance.onend = () => ballInner.classList.remove('speaking');
+    setTimeout(() => ballInner.classList.remove('speaking'), cleanText.length * 100); 
+    window.speechSynthesis.speak(utterance);
+}
+
+async function sendTextMessage() {
+    let text = userInput.value.trim();
+    if (!text) return;
+    
+    userInput.value = ''; 
+    ballInner.classList.add('speaking');
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        speak(data.reply); 
+    } catch (error) {
+        speak("Я потерял связь с сервером.");
+    }
+}
+
+mainBall.addEventListener('click', () => { userInput.focus(); });
+window.onload = () => { userInput.focus(); };
+</script>
+
+</body>
+</html>

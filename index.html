@@ -7,139 +7,40 @@
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: 'VT323', monospace; }
         
-        body { 
-            background: #000; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden;
-        }
-
-        /* Контейнер для шара */
-        .ball-container {
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Жёлтый смайлик */
-        .smiley { 
-            width: 400px; 
-            height: 400px; 
-            background: #ffcc00; 
-            border-radius: 50%;
-            position: relative; 
-            box-shadow: 0 0 60px rgba(255, 204, 0, 0.3);
-            transition: all 0.3s ease;
-        }
+        .ball-container { position: relative; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
-        /* Анимация говорения (пульсация) */
-        .smiley.speaking { 
-            animation: pulse 0.5s infinite alternate; 
-        }
-        @keyframes pulse { 
-            0% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); } 
-            100% { transform: scale(1.05); box-shadow: 0 0 120px rgba(255, 204, 0, 0.8); } 
-        }
+        .smiley { width: 400px; height: 400px; background: #ffcc00; border-radius: 50%; position: relative; box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); transition: all 0.3s ease; }
+        .smiley.speaking { animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); } 100% { transform: scale(1.05); box-shadow: 0 0 120px rgba(255, 204, 0, 0.8); } }
         
-        /* Глаза */
-        .eye { 
-            position: absolute; 
-            top: 110px; 
-            width: 30px; 
-            height: 60px; 
-            background: #000; 
-            border-radius: 50%; 
-            transition: all 0.2s ease; 
-        }
-        .eye.left { left: 110px; } 
-        .eye.right { right: 110px; }
+        .eye { position: absolute; top: 110px; width: 30px; height: 60px; background: #000; border-radius: 50%; transition: all 0.2s ease; }
+        .eye.left { left: 110px; } .eye.right { right: 110px; }
         
-        /* Рот */
-        .mouth { 
-            position: absolute; 
-            bottom: 90px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 160px; 
-            height: 60px; 
-            border-bottom: 12px solid #000; 
-            border-radius: 0 0 100px 100px; 
-            transition: all 0.3s ease; 
-        }
+        .mouth { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); width: 160px; height: 60px; border-bottom: 12px solid #000; border-radius: 0 0 100px 100px; transition: all 0.3s ease; }
         
-        /* Анимация рта */
-        .smiley.speaking .mouth { 
-            animation: talk 0.3s infinite alternate; 
-        }
-        @keyframes talk { 
-            0% { height: 60px; width: 160px; border-bottom-width: 12px; } 
-            100% { height: 80px; width: 140px; border-bottom-width: 20px; } 
-        }
+        .smiley.speaking .mouth { animation: talk 0.3s infinite alternate; }
+        @keyframes talk { 0% { height: 60px; width: 160px; border-bottom-width: 12px; } 100% { height: 80px; width: 140px; border-bottom-width: 20px; } }
         
-        /* Анимация глаз */
-        .smiley.speaking .eye {
-            animation: blink 0.6s infinite alternate;
-        }
-        @keyframes blink {
-            0% { transform: scaleY(1); }
-            100% { transform: scaleY(0.5); }
-        }
+        .smiley.speaking .eye { animation: blink 0.6s infinite alternate; }
+        @keyframes blink { 0% { transform: scaleY(1); } 100% { transform: scaleY(0.5); } }
         
-        /* Поле ввода (скрытое) */
-        .input-area { 
-            position: absolute; 
-            bottom: -80px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 100%; 
-            z-index: 20; 
-            opacity: 0; 
-            transition: opacity 0.3s; 
-        }
+        .input-area { position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%); width: 100%; z-index: 20; opacity: 0; transition: opacity 0.3s; }
+        .ball-container:hover .input-area { opacity: 0.5; }
+        .input-area input { width: 100%; padding: 15px; border: none; background: transparent; color: #fff; font-size: 18px; outline: none; font-family: 'VT323', monospace; text-align: center; border-bottom: 1px solid #555; }
         
-        .ball-container:hover .input-area { 
-            opacity: 0.5; 
-        }
-        
-        .input-area input { 
-            width: 100%; 
-            padding: 15px; 
-            border: none; 
-            background: transparent; 
-            color: #fff; 
-            font-size: 18px; 
-            outline: none; 
-            font-family: 'VT323', monospace; 
-            text-align: center;
-            border-bottom: 1px solid #555;
-        }
-        
-        .hint { 
-            position: absolute; 
-            bottom: 20px; 
-            font-size: 12px; 
-            color: #555; 
-            text-align: center; 
-            width: 100%; 
-            pointer-events: none; 
-        }
+        .hint { position: absolute; bottom: 20px; font-size: 12px; color: #555; text-align: center; width: 100%; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div class="ball-container" id="mainBall">
-        
         <div class="smiley" id="ballInner">
             <div class="eye left"></div>
             <div class="eye right"></div>
             <div class="mouth"></div>
         </div>
-        
         <div class="input-area">
             <input type="text" id="userInput" placeholder="Напиши мне..." onkeypress="if(event.key==='Enter') sendTextMessage()">
         </div>
@@ -169,12 +70,40 @@ function speak(text) {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'ru-RU';
     if (russianVoice) utterance.voice = russianVoice;
-    utterance.rate = 0.9; 
-    utterance.pitch = 0.9; 
+    utterance.rate = 0.9; utterance.pitch = 0.9; 
     
     utterance.onend = () => ballInner.classList.remove('speaking');
     setTimeout(() => ballInner.classList.remove('speaking'), cleanText.length * 100); 
     window.speechSynthesis.speak(utterance);
+}
+
+// Встроенная логика (без сервера)
+const simpleAnswers = {
+    'привет': 'Привет! Я Верити. Спроси меня о чём-нибудь.',
+    'как дела': 'Я здесь. Я всегда здесь. Жду тебя.',
+    'кто ты': 'Я — Верити. Жёлтый шар.',
+    'майнкрафт': 'Minecraft — это мир кубов. Я оттуда.',
+    'крипер': 'Криперы... Они шипят и взрываются.',
+    'кот': 'Коты... Они видят меня. Они знают.'
+};
+
+async function searchWikipedia(query) {
+    try {
+        const searchUrl = `https://ru.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+        const searchRes = await fetch(searchUrl);
+        const searchData = await searchRes.json();
+
+        if (searchData.query && searchData.query.search.length > 0) {
+            const title = searchData.query.search[0].title;
+            const summaryUrl = `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+            const summaryRes = await fetch(summaryUrl);
+            const summaryData = await summaryRes.json();
+            if (summaryData.extract) return summaryData.extract;
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
 }
 
 async function sendTextMessage() {
@@ -184,18 +113,31 @@ async function sendTextMessage() {
     userInput.value = ''; 
     ballInner.classList.add('speaking');
     
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-        });
-        
-        const data = await response.json();
-        speak(data.reply); 
-    } catch (error) {
-        speak("Я потерял связь с сервером.");
+    let lowerText = text.toLowerCase();
+    let reply = null;
+
+    // Проверяем простые ответы
+    for (let key in simpleAnswers) {
+        if (lowerText.includes(key)) {
+            reply = simpleAnswers[key];
+            break;
+        }
     }
+
+    // Если нет простого ответа, ищем в Википедии
+    if (!reply) {
+        reply = await searchWikipedia(text);
+    }
+
+    // Если ничего не нашли
+    if (!reply) {
+        reply = "Я не знаю ответа на этот вопрос. Но я запомню его.";
+    } else {
+        // Берем только первое предложение для краткости
+        reply = reply.split('.')[0] + '.';
+    }
+
+    speak(reply); 
 }
 
 mainBall.addEventListener('click', () => { userInput.focus(); });
